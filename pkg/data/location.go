@@ -7,7 +7,16 @@ import (
 
 // TODO: ensure that altitude actually correlates with location?
 func GetLocation() entities.Location {
-	var location entities.Location
+	location := entities.Location{
+		Altitude:            wyrand.Float64N(2200) - 200,
+		XAccuracy:           wyrand.Float64N(500),
+		YAccuracy:           wyrand.Float64N(500),
+		Speed:               wyrand.Float64N(70),
+		SpeedAccuracy:       wyrand.Float64N(15),
+		Orientation:         wyrand.Float64N(360),
+		OrientationAccuracy: wyrand.Float64N(250),
+	}
+
 	// 0 = north america, 1 = south america, 2 = africa, 3 = europe, 4 = asia, 5 oceania
 	continent := wyrand.Uint8N(6)
 	switch continent {
@@ -36,8 +45,6 @@ func GetLocation() entities.Location {
 		location.Lon = wyrand.Float64N(58) + 12
 		break
 	}
-
-	location.Altitude = wyrand.Float64N(2200) - 200
 
 	return location
 }
