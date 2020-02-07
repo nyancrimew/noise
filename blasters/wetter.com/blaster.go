@@ -8,7 +8,6 @@ import (
 	"github.com/deletescape/noise/pkg/wyrand"
 	"github.com/valyala/fasthttp"
 	"github.com/wI2L/jettison"
-	"log"
 	"math/rand"
 	"time"
 )
