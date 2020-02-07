@@ -6,6 +6,7 @@ type Seeder interface {
 	Init(context *SeederContext)
 	ReinitData(iteration uint64)
 	Loop(iteration uint64)
+	Sleep(iteration uint64)
 	Error() error
 }
 
