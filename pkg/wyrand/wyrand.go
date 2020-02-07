@@ -1,6 +1,7 @@
 package wyrand
 
 import (
+	"github.com/google/uuid"
 	"math"
 	"math/rand"
 )
@@ -55,17 +56,33 @@ func IntN(n int) int {
 	if n <= 0 {
 		return 0
 	}
-	return int(uint(Uint64()) >> 1) % n
+	return int(uint(Uint64())>>1) % n
 }
 
 func Bool() bool {
 	return (Uint64() % 2) == 1
 }
 
-func Float64() float64 {
-	return float64(Uint64() >> 11) / (1 << 53)
+func BoolP(probability float64) bool {
+	return Float64() <= probability
 }
 
-func Float64N(n float64) float64  {
+func Float64() float64 {
+	return float64(Uint64()>>11) / (1 << 53)
+}
+
+func Float64N(n float64) float64 {
 	return Float64() * n
+}
+
+func Bytes(n int) []byte {
+	data := make([]byte, n)
+	for i := 0; i < n; i++ {
+		data[i] = Uint8()
+	}
+	return data
+}
+
+func UUID3() uuid.UUID {
+	return uuid.NewMD5(uuid.Nil, Bytes(32))
 }
