@@ -2,22 +2,22 @@ package runner
 
 import (
 	"github.com/deletescape/noise/pkg/entities"
+	"github.com/valyala/fasthttp"
 	"log"
-	"net/http"
 	"sync"
 )
 
-var seeders []entities.Seeder
+var blasters []entities.Blaster
 
-func RegisterSeeder(seeder entities.Seeder) {
-	seeders = append(seeders, seeder)
+func RegisterBlaster(blaster entities.Blaster) {
+	blasters = append(blasters, blaster)
 }
 
-func Run(client *http.Client, debug bool) {
-	log.Println("initializing", len(seeders), "seeders")
-	eachSeeder(func(seeder entities.Seeder) {
-		seeder.Init(&entities.SeederContext{
-			Client: client,
+func Run(debug bool) {
+	log.Println("initializing", len(blasters), "blasters")
+	eachBlaster(func(blaster entities.Blaster) {
+		blaster.Init(&entities.BlasterContext{
+			Client: &fasthttp.Client{},
 			Debug:  debug,
 		})
 	})
@@ -25,22 +25,22 @@ func Run(client *http.Client, debug bool) {
 	log.Println("starting up")
 
 	var loopGroup sync.WaitGroup
-	// every seeder loop runs in its own goroutine
-	eachSeeder(func(seeder entities.Seeder) {
+	// every blaster loop runs in its own goroutine
+	eachBlaster(func(blaster entities.Blaster) {
 		loopGroup.Add(1)
 		go func() {
 			defer loopGroup.Done()
 			for i := uint64(0); ; i++ {
 				if i%1000 == 0 {
-					seeder.ReinitData(i)
+					blaster.ReinitData(i)
 				}
 
-				seeder.Loop(i)
+				blaster.Loop(i)
 
-				seeder.Sleep(i)
+				blaster.Sleep(i)
 
-				if err := seeder.Error(); err != nil {
-					log.Println("error in seeder:", err)
+				if err := blaster.Error(); err != nil {
+					log.Println("error in blaster:", err)
 				}
 			}
 		}()
@@ -48,8 +48,8 @@ func Run(client *http.Client, debug bool) {
 	loopGroup.Wait()
 }
 
-func eachSeeder(f func(entities.Seeder)) {
-	for _, seeder := range seeders {
-		f(seeder)
+func eachBlaster(f func(entities.Blaster)) {
+	for _, blaster := range blasters {
+		f(blaster)
 	}
 }
